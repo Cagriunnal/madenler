@@ -1,9 +1,14 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>İKÇÜ Coğrafya Jeolomorfolik şekiller ve Madenler Projesi</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İKÇÜ Coğrafya Jeomorfolik Şekiller ve Madenler Projesi</title>
     
+    <!-- Tailwind CSS for modern control panels & layout styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- amCharts 4 Libraries -->
     <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
     <script src="https://cdn.amcharts.com/lib/4/maps.js"></script>
     <script src="https://cdn.amcharts.com/lib/4/geodata/turkeyLow.js"></script>
@@ -11,17 +16,18 @@
     
     <style>
         body { 
-            font-family: 'Segoe UI', sans-serif; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             background-color: #8D1F2D; 
             margin: 0; padding: 0; 
             display: flex; flex-direction: column; 
-            align-items: center; justify-content: center;
-            height: 100vh; overflow: hidden;
+            align-items: center; justify-content: flex-start;
+            min-height: 100vh; overflow-x: hidden;
         }
-        .container {
+        .container-box {
             position: relative;
-            width: 850px;
-            height: 550px;
+            width: 1000px;
+            max-width: 95vw;
+            height: 520px;
         }
         #harita-alani { 
             width: 100%; height: 100%; 
@@ -29,40 +35,63 @@
             border-radius: 15px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.4);
         }
-        /* LOGO BURADA AYARLANIYOR */
+        /* LOGO STYLING */
         #ikcu-logo {
             position: absolute;
-            bottom: 20px;
-            left: 20px;
-            width: 120px; 
+            bottom: 15px;
+            left: 15px;
+            width: 100px; 
             height: auto;
             z-index: 9999;
             pointer-events: none;
         }
-        h2 { color: #ffffff; margin-bottom: 20px; font-size: 1.8rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
     </style>
 </head>
-<body>
+<body class="py-4">
 
-    <h2><bold>Türkiye İllere Göre Dağ ve Maden Analizi</bold></h2> 
+    <h2 class="text-white font-bold text-xl md:text-2xl mb-3 text-center drop-shadow-md">
+        Türkiye İllere Göre Dağ ve Maden Analizi
+    </h2> 
     
-    <div class="container">
+    <!-- Control Panel Container for Filters -->
+    <div class="w-[1000px] max-w-[95vw] bg-white/10 backdrop-blur-md p-3 rounded-xl mb-3 shadow-lg flex flex-wrap items-center justify-between gap-3 text-sm text-white">
+        <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+            <!-- Formation Filter -->
+            <div class="flex items-center gap-2">
+                <label for="olusumFilter" class="font-semibold whitespace-nowrap">Oluşumuna Göre:</label>
+                <select id="olusumFilter" class="bg-white text-gray-800 rounded px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#8D1F2D] font-medium">
+                    <option value="">-- Tüm Oluşumlar --</option>
+                    <option value="Kıvrım">Kıvrım</option>
+                    <option value="Kırık">Kırık</option>
+                </select>
+            </div>
+
+            <!-- Minerals Filter -->
+            <div class="flex items-center gap-2">
+                <label for="madenFilter" class="font-semibold whitespace-nowrap">Madenler:</label>
+                <select id="madenFilter" class="bg-white text-gray-800 rounded px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#8D1F2D] font-medium">
+                    <option value="">-- Tüm Madenler --</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Reset Button -->
+        <button id="resetBtn" class="bg-white text-[#8D1F2D] hover:bg-gray-100 font-bold px-4 py-1.5 rounded shadow transition-all duration-200 cursor-pointer flex items-center gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            Sıfırla / Temizle
+        </button>
+    </div>
+
+    <!-- Map Container -->
+    <div class="container-box">
         <div id="harita-alani"></div>
-        <img id="ikcu-logo" src="ikcucoglogo.png" alt="Logo">
+        <img id="ikcu-logo" src="ikcucoglogo.png" alt="Logo" onerror="this.style.display='none'">
     </div>
 
     <script>
-        am4core.useTheme(am4themes_animated);
-        var chart = am4core.create("harita-alani", am4maps.MapChart);
-        chart.geodata = am4geodata_turkeyLow; 
-        chart.projection = new am4maps.projections.Mercator();
-        chart.seriesContainer.draggable = false;
-        chart.seriesContainer.resizable = false;
-        chart.maxZoomLevel = 1; 
-
-        var polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
-        polygonSeries.useGeodata = true;
-
+        // Dictionary of notes for each province
         var seninNotlarin = {
             "Adana": "<b>Dağ Uzanışı:</b> Kıyıya paralel (KD-GB)<br><b>Oluşum Şekli:</b> Kıvrım (Toroslar)<br><b>Önemli Madenler:</b> Krom, Kurşun, Çinko",
             "Adıyaman": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Petrol, Bakır",
@@ -147,6 +176,47 @@
             "Zonguldak": "<b>Dağ Uzanışı:</b> Kıyıya paralel<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Taşkömürü"
         };
 
+        // Extract all unique minerals mentioned in the notes for the select dropdown
+        var mineralsSet = new Set();
+        for (var province in seninNotlarin) {
+            var note = seninNotlarin[province];
+            var match = note.match(/<b>Önemli Madenler:<\/b>\s*([^<]+)/i) || note.match(/<b>Madenler:<\/b>\s*([^<]+)/i);
+            if (match && match[1]) {
+                var items = match[1].split(',');
+                items.forEach(function(item) {
+                    // Clean up mineral names (remove parentheticals and extra spaces)
+                    var cleanItem = item.replace(/\(.*?\)/g, '').trim();
+                    if (cleanItem) {
+                        // Capitalize properly
+                        mineralsSet.add(cleanItem);
+                    }
+                });
+            }
+        }
+
+        // Populate minerals dropdown
+        var madenSelect = document.getElementById("madenFilter");
+        var sortedMinerals = Array.from(mineralsSet).sort(function(a, b) {
+            return a.localeCompare(b, 'tr');
+        });
+        sortedMinerals.forEach(function(mineral) {
+            var opt = document.createElement("option");
+            opt.value = mineral;
+            opt.textContent = mineral;
+            madenSelect.appendChild(opt);
+        });
+
+        am4core.useTheme(am4themes_animated);
+        var chart = am4core.create("harita-alani", am4maps.MapChart);
+        chart.geodata = am4geodata_turkeyLow; 
+        chart.projection = new am4maps.projections.Mercator();
+        chart.seriesContainer.draggable = false;
+        chart.seriesContainer.resizable = false;
+        chart.maxZoomLevel = 1; 
+
+        var polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
+        polygonSeries.useGeodata = true;
+
         var template = polygonSeries.mapPolygons.template;
         template.fill = am4core.color("#D3D3D3"); 
         template.stroke = am4core.color("#FFFFFF"); 
@@ -177,6 +247,71 @@
         });
 
         chart.logo.disabled = true;
+
+        var olusumFilter = document.getElementById("olusumFilter");
+        var resetBtn = document.getElementById("resetBtn");
+
+        function updateMapColors() {
+            var selectedOlusum = olusumFilter.value.toLowerCase();
+            var selectedMaden = madenSelect.value.toLowerCase();
+
+            polygonSeries.mapPolygons.each(function(polygon) {
+                var ilAdi = polygon.dataItem.dataContext.name;
+                var temizAd = ilAdi.replace('â', 'a').replace('î', 'i');
+                var note = (seninNotlarin[temizAd] || seninNotlarin[ilAdi] || "").toLowerCase();
+
+                var matchesOlusum = true;
+                if (selectedOlusum) {
+                    if (selectedOlusum === "kıvrım") {
+                        // Check if it has kıvrım and not solely exclusively something else without kıvrım
+                        matchesOlusum = note.includes("kıvrım");
+                    } else if (selectedOlusum === "kırık") {
+                        matchesOlusum = note.includes("kırık");
+                    }
+                }
+
+                var matchesMaden = true;
+                if (selectedMaden) {
+                    matchesMaden = note.includes(selectedMaden);
+                }
+
+                // If both filters are active, require matching both criteria
+                var shouldHighlight = false;
+                if (selectedOlusum && selectedMaden) {
+                    shouldHighlight = matchesOlusum && matchesMaden;
+                } else if (selectedOlusum) {
+                    shouldHighlight = matchesOlusum;
+                } else if (selectedMaden) {
+                    shouldHighlight = matchesMaden;
+                } else {
+                    shouldHighlight = false; // Neither selected
+                }
+
+                if (selectedOlusum === "" && selectedMaden === "") {
+                    polygon.fill = am4core.color("#D3D3D3");
+                } else if (shouldHighlight) {
+                    polygon.fill = am4core.color("#8D1F2D");
+                } else {
+                    polygon.fill = am4core.color("#D3D3D3");
+                }
+            });
+        }
+
+        olusumFilter.addEventListener("change", function() {
+            updateMapColors();
+        });
+
+        madenSelect.addEventListener("change", function() {
+            updateMapColors();
+        });
+
+        resetBtn.addEventListener("click", function() {
+            olusumFilter.value = "";
+            madenSelect.value = "";
+            polygonSeries.mapPolygons.each(function(polygon) {
+                polygon.fill = am4core.color("#D3D3D3");
+            });
+        });
     </script>
 </body>
 </html>
