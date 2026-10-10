@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>İKÇÜ Coğrafya Projesi</title>
+    
+    <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/maps.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/geodata/turkeyLow.js"></script>
+    <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+    
+    <style>
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background-color: #8D1F2D; 
+            margin: 0; padding: 0; 
+            display: flex; flex-direction: column; 
+            align-items: center; justify-content: center;
+            height: 100vh; overflow: hidden;
+        }
+        .container {
+            position: relative;
+            width: 850px;
+            height: 550px;
+        }
+        #harita-alani { 
+            width: 100%; height: 100%; 
+            background: #ffffff; 
+            border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+        /* LOGO BURADA AYARLANIYOR */
+        #ikcu-logo {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 120px; 
+            height: auto;
+            z-index: 9999;
+            pointer-events: none;
+        }
+        h2 { color: #ffffff; margin-bottom: 20px; font-size: 1.8rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+    </style>
+</head>
+<body>
+
+    <h2>Türkiye İllere Göre Dağ ve Maden Analizi</h2>
+    
+    <div class="container">
+        <div id="harita-alani"></div>
+        <img id="ikcu-logo" src="logo.png" alt="Logo">
+    </div>
+
+    <script>
+        am4core.useTheme(am4themes_animated);
+        var chart = am4core.create("harita-alani", am4maps.MapChart);
+        chart.geodata = am4geodata_turkeyLow; 
+        chart.projection = new am4maps.projections.Mercator();
+        chart.seriesContainer.draggable = false;
+        chart.seriesContainer.resizable = false;
+        chart.maxZoomLevel = 1; 
+
+        var polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
+        polygonSeries.useGeodata = true;
+
+        var seninNotlarin = {
+            "Adana": "<b>Dağ Uzanışı:</b> Kıyıya paralel (KD-GB)<br><b>Oluşum Şekli:</b> Kıvrım (Toroslar)<br><b>Önemli Madenler:</b> Krom, Kurşun, Çinko",
+            "Adıyaman": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Petrol, Bakır",
+            "Afyon": "<b>Dağ Uzanışı:</b> Karmaşık<br><b>Oluşum Şekli:</b> Çöküntü (Graben), Volkanik<br><b>Önemli Madenler:</b> Mermer, Jeotermal",
+            "Ağrı": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> Volkanik, Kıvrım<br><b>Önemli Madenler:</b> Pomza, Kükürt",
+            "Aksaray": "<b>Dağ Uzanışı:</b> Düzlük/Plato<br><b>Oluşum Şekli:</b> Volkanik (Hasan Dağı)<br><b>Önemli Madenler:</b> Tuz, Pomza",
+            "Amasya": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Linyit",
+            "Ankara": "<b>Dağ Uzanışı:</b> Kuzeydoğu-Güneybatı<br><b>Oluşum Şekli:</b> Kıvrım, Volkanik<br><b>Önemli Madenler:</b> Trona, Linyit",
+            "Antalya": "<b>Dağ Uzanışı:</b> Kıyıya paralel (Yay)<br><b>Oluşum Şekli:</b> Kıvrım (Toroslar)<br><b>Önemli Madenler:</b> Krom, Boksit, Barit",
+            "Ardahan": "<b>Dağ Uzanışı:</b> Yüksek Platolar<br><b>Oluşum Şekli:</b> Volkanik<br><b>Önemli Madenler:</b> Pomza",
+            "Artvin": "<b>Dağ Uzanışı:</b> Kıyıya paralel (D-B)<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Bakır, Altın",
+            "Aydin": "<b>Dağ Uzanışı:</b> Kıyıya dik (D-B)<br><b>Oluşum Şekli:</b> Kırık (Horst-Graben)<br><b>Önemli Madenler:</b> Linyit, Jeotermal",
+            "Balıkesir": "<b>Dağ Uzanışı:</b> Kuzeydoğu-Güneybatı<br><b>Oluşum Şekli:</b> Kırık, Kıvrım<br><b>Önemli Madenler:</b> Bor, Mermer, Demir",
+            "Bartın": "<b>Dağ Uzanışı:</b> Kıyıya paralel (D-B)<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Taşkömürü",
+            "Batman": "<b>Dağ Uzanışı:</b> Düzlük (Kuzeyi D-B)<br><b>Oluşum Şekli:</b> Kıvrım uzantısı<br><b>Önemli Madenler:</b> Petrol",
+            "Bayburt": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Doğaltaş, Bakır",
+            "Bilecik": "<b>Dağ Uzanışı:</b> Düzensiz<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Mermer, Seramik kili",
+            "Bingöl": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> Kıvrım, Volkanik<br><b>Önemli Madenler:</b> Demir",
+            "Bitlis": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> Kıvrım, Volkanik<br><b>Önemli Madenler:</b> Pomza",
+            "Bolu": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Linyit",
+            "Burdur": "<b>Dağ Uzanışı:</b> Kuzeydoğu-Güneybatı<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Krom, Mermer",
+            "Bursa": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> İç Püskürük (Masif), Kırık<br><b>Önemli Madenler:</b> Bor, Mermer, Volfram",
+            "Çanakkale": "<b>Dağ Uzanışı:</b> Kuzeydoğu-Güneybatı<br><b>Oluşum Şekli:</b> Kırık, Kıvrım<br><b>Önemli Madenler:</b> Linyit, Altın, Kurşun",
+            "Çankırı": "<b>Dağ Uzanışı:</b> Kuzeydoğu-Güneybatı<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Kaya tuzu",
+            "Çorum": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Linyit, Bakır",
+            "Denizli": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> Kırık (Horst-Graben)<br><b>Önemli Madenler:</b> Mermer, Traverten, Jeotermal",
+            "Diyarbakır": "<b>Dağ Uzanışı:</b> Düzlük<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Petrol, Bakır",
+            "Düzce": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> Kırık (Çöküntü Ovası)<br><b>Önemli Madenler:</b> Linyit",
+            "Edirne": "<b>Dağ Uzanışı:</b> Kuzeybatı-Güneydoğu<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Linyit",
+            "Elazığ": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Bakır, Krom, Kurşun, Çinko",
+            "Erzincan": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> Kırık (Graben), Kıvrım<br><b>Önemli Madenler:</b> Demir, Asbest",
+            "Erzurum": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> Kıvrım, Volkanik<br><b>Önemli Madenler:</b> Oltu taşı, Linyit",
+            "Eskişehir": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> Çöküntü, Kıvrım<br><b>Önemli Madenler:</b> Bor, Lületaşı, Krom",
+            "Gaziantep": "<b>Dağ Uzanışı:</b> Düzlük<br><b>Oluşum Şekli:</b> Kıvrım uzantısı<br><b>Önemli Madenler:</b> Fosfat, Boksit",
+            "Giresun": "<b>Dağ Uzanışı:</b> Kıyıya paralel (D-B)<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Bakır, Kurşun, Çinko",
+            "Gümüşhane": "<b>Dağ Uzanışı:</b> Kıyıya paralel (D-B)<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Altın, Gümüş, Kurşun",
+            "Hakkari": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> Kıvrım (Cilo Dağları)<br><b>Önemli Madenler:</b> Çinko, Kurşun",
+            "Hatay": "<b>Dağ Uzanışı:</b> Kuzey-Güney<br><b>Oluşum Şekli:</b> Kırık (Horst-Graben)<br><b>Önemli Madenler:</b> Boksit, Asbest",
+            "Iğdır": "<b>Dağ Uzanışı:</b> Düzlük (Çöküntü)<br><b>Oluşum Şekli:</b> Volkanik yamaç<br><b>Önemli Madenler:</b> Kaya tuzu",
+            "Isparta": "<b>Dağ Uzanışı:</b> Kuzey-Güney<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Kükürt, Mermer",
+            "İstanbul": "<b>Dağ Uzanışı:</b> Dağlık değil, Engebeli<br><b>Oluşum Şekli:</b> Aşınmış Masif<br><b>Önemli Madenler:</b> Linyit, Silis kumu",
+            "İzmir": "<b>Dağ Oluşum Şekli:</b> Kırık Dağları<br><b>Grabenler:</b> Bakırçay, Gediz, Küçük Menderes<b><br>Madenler:</b> Altın, Cıva, Linyit, Demir",
+            "Kahramanmaraş": "<b>Dağ Uzanışı:</b> KD-GB<br><b>Oluşum Şekli:</b> Kırık, Kıvrım<br><b>Önemli Madenler:</b> Linyit, Demir",
+            "Karabük": "<b>Dağ Uzanışı:</b> Kıyıya paralel<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Dolomit",
+            "Karaman": "<b>Dağ Uzanışı:</b> Düzlük<br><b>Oluşum Şekli:</b> Kıvrım, Volkanik<br><b>Önemli Madenler:</b> Linyit",
+            "Kars": "<b>Dağ Uzanışı:</b> Platolar<br><b>Oluşum Şekli:</b> Volkanik<br><b>Önemli Madenler:</b> Pomza, Obsidyen",
+            "Kastamonu": "<b>Dağ Uzanışı:</b> Kıyıya paralel<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Bakır (Küre)",
+            "Kayseri": "<b>Dağ Uzanışı:</b> KD-GB<br><b>Oluşum Şekli:</b> Volkanik, Kıvrım<br><b>Önemli Madenler:</b> Çinko, Kurşun, Demir",
+            "Kırıkkale": "<b>Dağ Uzanışı:</b> KD-GB<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Demir",
+            "Kırklareli": "<b>Dağ Uzanışı:</b> KB-GD<br><b>Oluşum Şekli:</b> Kıvrım (Yıldız)<br><b>Önemli Madenler:</b> Doğalgaz, Cam kumu",
+            "Kırşehir": "<b>Dağ Uzanışı:</b> Dağınık<br><b>Oluşum Şekli:</b> Masif<br><b>Önemli Madenler:</b> Mermer, Florit",
+            "Kilis": "<b>Dağ Uzanışı:</b> Düzlük",
+            "Kocaeli": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Kuvarsit",
+            "Konya": "<b>Dağ Uzanışı:</b> Düz<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Linyit, Boksit, Manyezit",
+            "Kütahya": "<b>Dağ Uzanışı:</b> Karmaşık<br><b>Oluşum Şekli:</b> Graben, Kıvrım<br><b>Önemli Madenler:</b> Bor, Linyit, Gümüş",
+            "Malatya": "<b>Dağ Uzanışı:</b> KD-GB<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Demir (Hekimhan)",
+            "Manisa": "<b>Dağ Uzanışı:</b> Kıyıya dik<br><b>Oluşum Şekli:</b> Kırık (Horst-Graben)<br><b>Önemli Madenler:</b> Linyit, Altın",
+            "Mardin": "<b>Dağ Uzanışı:</b> Düzlük<br><b>Oluşum Şekli:</b> Kıvrım uzantısı<br><b>Önemli Madenler:</b> Fosfat",
+            "Mersin": "<b>Dağ Uzanışı:</b> Kıyıya paralel<br><b>Oluşum Şekli:</b> Kıvrım (Toroslar)<br><b>Önemli Madenler:</b> Krom, Demir",
+            "Muğla": "<b>Dağ Uzanışı:</b> Kıyıya paralel<br><b>Oluşum Şekli:</b> Kırık, Kıvrım<br><b>Önemli Madenler:</b> Krom, Linyit, Mermer",
+            "Muş": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> Kırık, Kıvrım<br><b>Önemli Madenler:</b> Barit, Tuz",
+            "Nevşehir": "<b>Oluşum Şekli:</b> Volkanik<br><b>Önemli Madenler:</b> Pomza, Tüf",
+            "Niğde": "<b>Dağ Uzanışı:</b> KD-GB<br><b>Oluşum Şekli:</b> Volkanik, Kıvrım<br><b>Önemli Madenler:</b> Antimon, Demir",
+            "Ordu": "<b>Dağ Uzanışı:</b> Kıyıya paralel<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Kurşun, Çinko, Bakır",
+            "Osmaniye": "<b>Dağ Uzanışı:</b> Kuzey-Güney<br><b>Oluşum Şekli:</b> Kırık<br><b>Önemli Madenler:</b> Krom",
+            "Rize": "<b>Dağ Uzanışı:</b> Kıyıya paralel<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Bakır (Çayeli)",
+            "Sakarya": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Demir",
+            "Samsun": "<b>Dağ Uzanışı:</b> Kıyıya paralel<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Linyit",
+            "Siirt": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Bakır, Petrol",
+            "Sinop": "<b>Dağ Uzanışı:</b> Kıyıya paralel<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Bakır, Çinko",
+            "Sivas": "<b>Dağ Uzanışı:</b> KD-GB<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Demir, Asbest",
+            "Şanlıurfa": "<b>Dağ Uzanışı:</b> Düzlük<br><b>Oluşum Şekli:</b> Hafif Kıvrım<br><b>Önemli Madenler:</b> Kireçtaşı",
+            "Şırnak": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Asfaltit, Kömür",
+            "Tekirdağ": "<b>Dağ Uzanışı:</b> KD-GB<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Linyit, Doğalgaz",
+            "Tokat": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Antimon, Bakır",
+            "Trabzon": "<b>Dağ Uzanışı:</b> Kıyıya paralel<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Bakır, Çinko, Kurşun",
+            "Tunceli": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Bakır, Tuz",
+            "Uşak": "<b>Dağ Uzanışı:</b> Karmaşık<br><b>Oluşum Şekli:</b> Kıvrım, Volkanik<br><b>Önemli Madenler:</b> Altın, Linyit",
+            "Van": "<b>Dağ Uzanışı:</b> Kuzey-Güney<br><b>Oluşum Şekli:</b> Volkanik, Kıvrım<br><b>Önemli Madenler:</b> Pomza, Tuz",
+            "Yalova": "<b>Dağ Uzanışı:</b> Doğu-Batı<br><b>Oluşum Şekli:</b> Kırık<br><b>Önemli Madenler:</b> Jeotermal",
+            "Yozgat": "<b>Dağ Uzanışı:</b> Dağınık<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Kaya tuzu, Demir",
+            "Zonguldak": "<b>Dağ Uzanışı:</b> Kıyıya paralel<br><b>Oluşum Şekli:</b> Kıvrım<br><b>Önemli Madenler:</b> Taşkömürü"
+        };
+
+        var template = polygonSeries.mapPolygons.template;
+        template.fill = am4core.color("#D3D3D3"); 
+        template.stroke = am4core.color("#FFFFFF"); 
+        template.strokeWidth = 1.5;
+
+        var hoverState = template.states.create("hover");
+        hoverState.properties.fill = am4core.color("#8D1F2D"); 
+
+        polygonSeries.tooltip = new am4core.Tooltip();
+        polygonSeries.tooltip.pointerOrientation = "vertical"; 
+        polygonSeries.tooltip.getFillFromObject = false; 
+        polygonSeries.tooltip.background.fill = am4core.color("#ffffff"); 
+        polygonSeries.tooltip.background.stroke = am4core.color("#8D1F2D"); 
+        polygonSeries.tooltip.background.strokeWidth = 2;
+        
+        template.adapter.add("tooltipHTML", function(html, target) {
+            if (target.dataItem && target.dataItem.dataContext) {
+                var ilAdi = target.dataItem.dataContext.name;
+                var temizAd = ilAdi.replace('â', 'a').replace('î', 'i');
+                var not = seninNotlarin[temizAd] || seninNotlarin[ilAdi] || "Veri yok.";
+                
+                return '<div style="padding: 10px; width: 250px; white-space: normal; text-align: left; color: black;">' +
+                       '<b style="color: #8D1F2D; font-size: 16px; display: block; border-bottom: 1px solid #eee; margin-bottom: 5px;">' + ilAdi + '</b>' +
+                       '<span style="font-size: 14px; line-height: 1.4;">' + not + '</span>' +
+                       '</div>';
+            }
+            return html;
+        });
+
+        chart.logo.disabled = true;
+    </script>
+</body>
+</html>
